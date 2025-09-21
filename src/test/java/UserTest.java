@@ -22,6 +22,7 @@ public class UserTest {
         userSteps = new UserSteps();
         userCreateRequest = new UserCreateRequest(email,password,name);
         createUser = userSteps.createUser(userCreateRequest);
+        accessToken = createUser.jsonPath().getString("accessToken");
     }
 
     @Test
@@ -32,7 +33,6 @@ public class UserTest {
             .assertThat().body("success", equalTo(true))
             .and()
             .statusCode(200);
-    accessToken = createUser.jsonPath().getString("accessToken");
     }
 
 
@@ -44,20 +44,29 @@ public class UserTest {
                 .assertThat().body("success", equalTo(true))
                 .and()
                 .statusCode(200);
-        accessToken = createUser.jsonPath().getString("accessToken");
         createUser = userSteps.createUser(userCreateRequest);
         createUser.then()
                 .assertThat().body("success", equalTo(false))
                 .and()
                 .statusCode(403);
+    }
 
+    @Test
+    @DisplayName("Создание пользователя без email")
+    @Description("Ожидаем ошибку при создании пользователя без email")
+    public void createUserWithoutEmail(){
+
+        userCreateRequest.setEmail("");
+        createUser = userSteps.createUser(userCreateRequest);
+        createUser.then()
+                .assertThat().body("success", equalTo(false))
+                .and()
+                .statusCode(403);
     }
 
 @After
     public void tearDown(){
-        if (accessToken != null){
             userSteps.deleteUser(accessToken);
-        }
 }
 
 }
