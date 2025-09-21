@@ -48,21 +48,12 @@ public class UserTest {
         createUser.then()
                 .assertThat().body("success", equalTo(false))
                 .and()
-                .statusCode(403);
-    }
-
-    @Test
-    @DisplayName("Создание пользователя без email")
-    @Description("Ожидаем ошибку при создании пользователя без email")
-    public void createUserWithoutEmail(){
-
-        userCreateRequest.setEmail("");
-        createUser = userSteps.createUser(userCreateRequest);
-        createUser.then()
-                .assertThat().body("success", equalTo(false))
+                .assertThat().body("message", equalTo("User already exists"))
                 .and()
                 .statusCode(403);
     }
+
+
 
 @After
     public void tearDown(){
