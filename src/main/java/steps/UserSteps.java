@@ -3,6 +3,7 @@ package steps;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import pojo.UserCreateRequest;
+import pojo.UserLoginRequest;
 
 import static constants.Url.*;
 import static io.restassured.RestAssured.given;
@@ -26,5 +27,13 @@ public Response createUser(UserCreateRequest userCreateRequest){
                 .delete(DELETE_USER_URL);
     }
 
-
+    @Step("Авторизация пользователя")
+    public Response loginUser (UserLoginRequest userLoginRequest){
+        return given()
+                .baseUri(BASE_URL)
+                .header("Content-type", "application/json")
+                .body(userLoginRequest)
+                .when()
+                .post(LOGIN_USER_URL);
+    }
 }
