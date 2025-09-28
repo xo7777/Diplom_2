@@ -52,13 +52,12 @@ public class OrderTest {
 
     @Test
     @DisplayName("Создание заказа без авторизации")
-    @Description("Ожидаем успешное создание заказа")
+    @Description("Ожидаем ошибку 401 создания заказа у неавторизованного пользователя")
     public void createOrderNoAuthTest(){
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest(ingredients);
         orderSteps.createOrderNoLogin(orderCreateRequest)
-                .then().body("success", equalTo(true))
-                .and()
-                .statusCode(200);
+                .then()
+                .statusCode(401);
     }
 
 
