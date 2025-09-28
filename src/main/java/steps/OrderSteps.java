@@ -20,6 +20,7 @@ public class OrderSteps {
                 .when()
                 .post(CRAETE_ORDER_URL);
     }
+
     @Step("Создание заказа без авторизации")
     public Response createOrderNoLogin(OrderCreateRequest orderCreateRequest) {
         return given()

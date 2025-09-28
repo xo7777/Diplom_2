@@ -24,12 +24,12 @@ public class OrderTest {
     private UserCreateRequest userCreateRequest;
     private Response createUser;
     private OrderSteps orderSteps;
-    private List<String> ingredients = List.of(BUN_HASH,BEEF_METEORITE_HASH,CHEESE_HASH);
+    private List<String> ingredients = List.of(BUN_HASH, BEEF_METEORITE_HASH, CHEESE_HASH);
 
     @Before
-    public void setUp(){
+    public void setUp() {
         userSteps = new UserSteps();
-        userCreateRequest = new UserCreateRequest(email,password,name);
+        userCreateRequest = new UserCreateRequest(email, password, name);
         createUser = userSteps.createUser(userCreateRequest);
         accessToken = createUser.jsonPath().getString("accessToken");
         orderSteps = new OrderSteps();
@@ -39,7 +39,7 @@ public class OrderTest {
     @Test
     @DisplayName("Создание заказа авторизованным пользователем")
     @Description("Успешное создание заказа")
-    public void createOrderWithAuthTest(){
+    public void createOrderWithAuthTest() {
         UserLoginRequest userLoginRequest = new UserLoginRequest(email, password);
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest(ingredients);
         userSteps.loginUser(userLoginRequest);
@@ -53,7 +53,7 @@ public class OrderTest {
     @Test
     @DisplayName("Создание заказа без авторизации")
     @Description("Ожидаем ошибку 401 создания заказа у неавторизованного пользователя")
-    public void createOrderNoAuthTest(){
+    public void createOrderNoAuthTest() {
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest(ingredients);
         orderSteps.createOrderNoLogin(orderCreateRequest)
                 .then()
@@ -62,7 +62,7 @@ public class OrderTest {
 
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         userSteps.deleteUser(accessToken);
     }
 

@@ -31,16 +31,16 @@ public class ParameterizedOrderTest {
     private List<String> ingredients;
     private int statusCode;
 
-    public ParameterizedOrderTest(List<String> ingredients, int statusCode){
+    public ParameterizedOrderTest(List<String> ingredients, int statusCode) {
         this.ingredients = ingredients;
         this.statusCode = statusCode;
     }
 
 
-    @Parameterized.Parameters (name = "list of ingredients - {0}, status code - {1}")
-    public static Object[][] testData(){
-        return new Object[][] {
-                {List.of(BUN_HASH,BEEF_METEORITE_HASH,CHEESE_HASH), 200},
+    @Parameterized.Parameters(name = "list of ingredients - {0}, status code - {1}")
+    public static Object[][] testData() {
+        return new Object[][]{
+                {List.of(BUN_HASH, BEEF_METEORITE_HASH, CHEESE_HASH), 200},
                 {List.of(INCORRECT_HASH), 500},
                 {List.of(), 400},
 
@@ -48,7 +48,7 @@ public class ParameterizedOrderTest {
     }
 
     @Before
-    public void setUp(){
+    public void setUp() {
         userSteps = new UserSteps();
         orderSteps = new OrderSteps();
         userCreateRequest = new UserCreateRequest(email, password, name);
@@ -60,22 +60,18 @@ public class ParameterizedOrderTest {
     }
 
 
-@Test
-@DisplayName("Создание заказа с хешем, без хеша, с некорректным хешем")
-@Description("Успешное создание заказа с валидными значениями и ошибка при создании заказа без хеша и с некорректным хешем")
-public void createOrderTest(){
+    @Test
+    @DisplayName("Создание заказа с хешем, без хеша, с некорректным хешем")
+    @Description("Успешное создание заказа с валидными значениями и ошибка при создании заказа без хеша и с некорректным хешем")
+    public void createOrderTest() {
         orderSteps.createOrderWithAuth(orderCreateRequest, accessToken)
                 .then().statusCode(statusCode);
 
-}
-
-
-
-
+    }
 
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         userSteps.deleteUser(accessToken);
     }
 }

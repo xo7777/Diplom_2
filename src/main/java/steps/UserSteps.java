@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 public class UserSteps {
 
     @Step("Создание пользователя")
-public Response createUser(UserCreateRequest userCreateRequest){
+    public Response createUser(UserCreateRequest userCreateRequest) {
         return given()
                 .baseUri(BASE_URL)
                 .header("Content-type", "application/json")
@@ -19,8 +19,9 @@ public Response createUser(UserCreateRequest userCreateRequest){
                 .when()
                 .post(CREATE_USER_URL);
     }
+
     @Step("Удаление пользователя")
-    public void deleteUser(String accessToken){
+    public void deleteUser(String accessToken) {
         given()
                 .baseUri(BASE_URL)
                 .header("Authorization", accessToken)
@@ -28,7 +29,7 @@ public Response createUser(UserCreateRequest userCreateRequest){
     }
 
     @Step("Авторизация пользователя")
-    public Response loginUser (UserLoginRequest userLoginRequest){
+    public Response loginUser(UserLoginRequest userLoginRequest) {
         return given()
                 .baseUri(BASE_URL)
                 .header("Content-type", "application/json")
