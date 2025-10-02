@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
@@ -15,12 +16,15 @@ import steps.UserSteps;
 import java.util.List;
 
 import static constants.HashIngredients.*;
+import static org.apache.http.HttpStatus.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 @RunWith(Parameterized.class)
 public class ParameterizedOrderTest {
-    private String email = "kukururu8979878@gmail.com";
-    private String password = "password6548";
-    private String name = "kukuruzina99";
+    private String email;
+    private String password;
+    private String name;
     private String accessToken;
     private UserSteps userSteps;
     private UserCreateRequest userCreateRequest;
@@ -30,19 +34,21 @@ public class ParameterizedOrderTest {
     private OrderSteps orderSteps;
     private List<String> ingredients;
     private int statusCode;
+    private String expectedMessage;
 
-    public ParameterizedOrderTest(List<String> ingredients, int statusCode) {
+    public ParameterizedOrderTest(List<String> ingredients, int statusCode, String expectedMessage) {
         this.ingredients = ingredients;
         this.statusCode = statusCode;
+        this.expectedMessage = expectedMessage;
     }
 
 
-    @Parameterized.Parameters(name = "list of ingredients - {0}, status code - {1}")
+    @Parameterized.Parameters(name = "list of ingredients - {0}, status code - {1}, expected message - {2}")
     public static Object[][] testData() {
         return new Object[][]{
-                {List.of(BUN_HASH, BEEF_METEORITE_HASH, CHEESE_HASH), 200},
-                {List.of(INCORRECT_HASH), 500},
-                {List.of(), 400},
+                {List.of(BUN_HASH, BEEF_METEORITE_HASH, CHEESE_HASH), SC_OK, "number"},
+                {List.of(INCORRECT_HASH), SC_INTERNAL_SERVER_ERROR, "Internal Server Error"},
+                {List.of(), SC_BAD_REQUEST, "Ingredient ids must be provided"},
 
         };
     }
@@ -51,6 +57,10 @@ public class ParameterizedOrderTest {
     public void setUp() {
         userSteps = new UserSteps();
         orderSteps = new OrderSteps();
+        Faker faker = new Faker();
+        email = faker.bothify("??????#####@ya.ru");
+        password = faker.bothify("?##?#?#?#");
+        name = faker.letterify("?????");
         userCreateRequest = new UserCreateRequest(email, password, name);
         userLoginRequest = new UserLoginRequest(email, password);
         orderCreateRequest = new OrderCreateRequest(ingredients);
@@ -65,7 +75,10 @@ public class ParameterizedOrderTest {
     @Description("Успешное создание заказа с валидными значениями и ошибка при создании заказа без хеша и с некорректным хешем")
     public void createOrderTest() {
         orderSteps.createOrderWithAuth(orderCreateRequest, accessToken)
-                .then().statusCode(statusCode);
+                .then()
+                .statusCode(statusCode)
+                .and()
+                .assertThat().body(containsString(expectedMessage));
 
     }
 

@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
@@ -6,6 +7,7 @@ import org.junit.runners.Parameterized;
 import pojo.UserCreateRequest;
 import steps.UserSteps;
 
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
@@ -24,10 +26,14 @@ public class ParameterizedCreateUserTest {
     }
     @Parameterized.Parameters (name = "email - {0}, password - {1}, name - {2}, expected - {3}")
     public static Object[][] testData(){
+        Faker faker = new Faker();
+        String email = faker.bothify("??????#####@ya.ru");
+        String password = faker.bothify("?##?#?#?#");
+        String name = faker.letterify("?????");
         return new Object[][] {
-                {"", "password123", "kukuruz99", "Email, password and name are required fields"},
-                {"kukurirere1516@mail.ru", "", "kukuruz99", "Email, password and name are required fields"},
-                {"kukurirere1516@mail.ru", "password123", "", "Email, password and name are required fields"},
+                {"", password, name, "Email, password and name are required fields"},
+                {email, "", name, "Email, password and name are required fields"},
+                {email, password, "", "Email, password and name are required fields"},
 
         };
     }
@@ -40,8 +46,8 @@ public class ParameterizedCreateUserTest {
         UserCreateRequest userCreateRequest = new UserCreateRequest(email,password,name);
         userSteps.createUser(userCreateRequest)
                 .then()
-                .assertThat().body("message", equalTo(expected))
+                .statusCode(SC_FORBIDDEN)
                 .and()
-                .statusCode(403);
+                .assertThat().body("message", equalTo(expected));
     }
 }

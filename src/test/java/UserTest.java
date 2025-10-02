@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
@@ -6,12 +7,15 @@ import org.junit.Before;
 import org.junit.Test;
 import pojo.UserCreateRequest;
 import steps.UserSteps;
+
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class UserTest {
-    private String email = "kukururu8979878@gmail.com";
-    private String password = "password6548";
-    private String name = "kukuruzina99";
+    private String email;
+    private String password;
+    private String name;
     private String accessToken;
     private UserSteps userSteps;
     private UserCreateRequest userCreateRequest;
@@ -20,6 +24,10 @@ public class UserTest {
     @Before
     public void setUp(){
         userSteps = new UserSteps();
+        Faker faker = new Faker();
+        email = faker.bothify("??????#####@ya.ru");
+        password = faker.bothify("?##?#?#?#");
+        name = faker.letterify("?????");
         userCreateRequest = new UserCreateRequest(email,password,name);
         createUser = userSteps.createUser(userCreateRequest);
         accessToken = createUser.jsonPath().getString("accessToken");
@@ -30,9 +38,9 @@ public class UserTest {
     @Description("Успешное создание нового пользователя")
     public void createUserTest(){
     createUser.then()
-            .assertThat().body("success", equalTo(true))
+            .statusCode(SC_OK)
             .and()
-            .statusCode(200);
+            .assertThat().body("success", equalTo(true));
     }
 
 
@@ -41,18 +49,18 @@ public class UserTest {
     @Description("Ожидаем ошибку при создании одинаковых пользователей")
     public void createSameUser(){
         createUser.then()
-                .assertThat().body("success", equalTo(true))
+                .statusCode(SC_OK)
                 .and()
-                .statusCode(200);
+                .assertThat().body("success", equalTo(true));
         createUser = userSteps.createUser(userCreateRequest);
         createUser.then()
+                .statusCode(SC_FORBIDDEN)
+                .and()
                 .assertThat().body("success", equalTo(false))
                 .and()
-                .assertThat().body("message", equalTo("User already exists"))
-                .and()
-                .statusCode(403);
-    }
+                .assertThat().body("message", equalTo("User already exists"));
 
+    }
 
 
 @After

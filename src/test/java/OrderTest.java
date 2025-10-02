@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
@@ -13,12 +14,15 @@ import steps.UserSteps;
 import java.util.List;
 
 import static constants.HashIngredients.*;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class OrderTest {
-    private String email = "kukururu8979878@gmail.com";
-    private String password = "password6548";
-    private String name = "kukuruzina99";
+    private String email;
+    private String password;
+    private String name;
     private String accessToken;
     private UserSteps userSteps;
     private UserCreateRequest userCreateRequest;
@@ -29,6 +33,10 @@ public class OrderTest {
     @Before
     public void setUp() {
         userSteps = new UserSteps();
+        Faker faker = new Faker();
+        email = faker.bothify("??????#####@ya.ru");
+        password = faker.bothify("?##?#?#?#");
+        name = faker.letterify("?????");
         userCreateRequest = new UserCreateRequest(email, password, name);
         createUser = userSteps.createUser(userCreateRequest);
         accessToken = createUser.jsonPath().getString("accessToken");
@@ -44,9 +52,10 @@ public class OrderTest {
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest(ingredients);
         userSteps.loginUser(userLoginRequest);
         orderSteps.createOrderWithAuth(orderCreateRequest, accessToken)
-                .then().body("success", equalTo(true))
+                .then()
+                .statusCode(SC_OK)
                 .and()
-                .statusCode(200);
+                .assertThat().body("success", equalTo(true));
     }
 
 
@@ -57,7 +66,9 @@ public class OrderTest {
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest(ingredients);
         orderSteps.createOrderNoLogin(orderCreateRequest)
                 .then()
-                .statusCode(401);
+                .statusCode(SC_UNAUTHORIZED)
+                .and()
+                .assertThat().body("success", equalTo(false));
     }
 
 
