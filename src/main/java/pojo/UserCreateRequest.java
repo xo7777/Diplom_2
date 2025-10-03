@@ -1,8 +1,5 @@
 package pojo;
 
-
-
-
 public class UserCreateRequest {
     private String email;
     private String password;

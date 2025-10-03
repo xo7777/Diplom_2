@@ -55,7 +55,9 @@ public class OrderTest {
                 .then()
                 .statusCode(SC_OK)
                 .and()
-                .assertThat().body("success", equalTo(true));
+                .assertThat().body("success", equalTo(true))
+                .and()
+                .assertThat().body("name", equalTo("Метеоритный краторный астероидный бургер"));
     }
 
 

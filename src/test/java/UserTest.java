@@ -11,6 +11,7 @@ import steps.UserSteps;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class UserTest {
     private String email;
@@ -40,7 +41,9 @@ public class UserTest {
     createUser.then()
             .statusCode(SC_OK)
             .and()
-            .assertThat().body("success", equalTo(true));
+            .assertThat().body("success", equalTo(true))
+            .and()
+            .assertThat().body("accessToken", notNullValue());
     }
 
 
